@@ -7,10 +7,10 @@ import scala.util.Random
 
 object Context {
   val alpha: Int = 1
-  val beta: Int = 5
-  val vaporCoeff: Double = 20.0
+  val beta: Int = 3
+  val vaporCoeff: Double = 10.0
   val ants: Int = 10
-  val iterations: Int = 100
+  val iterations: Int = 1000
 
   val cities: Seq[City] =
     Source.fromFile("src/main/resources/ATT48.txt")
@@ -23,11 +23,11 @@ object Context {
     case Seq(cityA: City, cityB: City) => Set(cityA, cityB) -> cityA.distanceTo(cityB)
   }.toMap
 
-  val initialScentMap: Map[Set[City], Double] = cities.combinations(2).map {
-    case Seq(cityA: City, cityB: City) => Set(cityA, cityB) -> 1.0
-  }.toMap
-
-  val scentMap: mutable.Map[Set[City], Double] = collection.mutable.Map(initialScentMap.toSeq: _*)
+  val scentMap: mutable.Map[Set[City], Double] = collection.mutable.Map(
+    cities.combinations(2).map {
+      case Seq(cityA: City, cityB: City) => Set(cityA, cityB) -> 1.0
+    }.toMap.toSeq: _*
+  )
 
   def startingPoint: City = Random.shuffle(cities).head
 }

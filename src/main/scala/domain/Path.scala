@@ -1,7 +1,9 @@
 package domain
 
 import scala.collection.immutable.{Seq, Set}
-import Context.{cityMap, scentMap, alpha, beta}
+import Context.{alpha, beta, cityMap, scentMap}
+
+import scala.util.Random
 
 case class Path(cities: Seq[City]) {
   def addCity(city: City): Path = Path(cities :+ city)
@@ -22,10 +24,31 @@ case class Path(cities: Seq[City]) {
       (nextCity, attractiveness)
     }
 
-    val totalWeight = weightedChoices.map(_._2).sum
-    val probabilities = weightedChoices.map { case (city, weight) => (city, weight / totalWeight) }
+    val totalWeight: Double = weightedChoices.map(_._2).sum
+    val probabilities: Seq[(City, Double)] = weightedChoices.map { case (city, weight) => (city, weight / totalWeight) }
 
-    val selectedCity = probabilities.maxBy(_._2)._1
-    selectedCity
+    def takeRandomAtChance: City = {
+      val m = if(totalWeight < 1) 1 else totalWeight.toInt
+      val r = Random.nextInt(m)
+      var cumulative = 0.0
+      probabilities.find {
+        case (_, probability) =>
+          cumulative += probability
+          cumulative >= r
+      }.map(_._1).getOrElse(probabilities.last._1)
+    }
+
+    takeRandomAtChance
+  }
+
+  def leaveScent: Unit = {
+    for (i <- 0 until cities.length - 1) {
+      val route = Set(cities(i), cities(i+1))
+      val scentAmount: Double = 1.0 / cityMap(route)
+      scentMap.updateWith(route) {
+        case Some(value) => Some(value + scentAmount)
+        case None => Some(scentAmount)
+      }
+    }
   }
 }
