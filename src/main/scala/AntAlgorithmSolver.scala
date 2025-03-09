@@ -1,12 +1,12 @@
-import domain.{City, Path}
-import domain.Context.{ants, cities, iterations, scentMap, startingPoint, vaporCoeff}
+import domain.{ City, Path }
+import domain.Context.{ ants, cities, iterations, scentMap, startingPoint, vaporCoeff }
 import utils.Image
 
 object AntAlgorithmSolver extends App {
   private def traverseWithAnt(cities: Set[City]): Path = {
     def oneStepDeeper(currentPath: Path): Path = {
       val canTravelTo = cities.diff(currentPath.cities.toSet)
-      if(canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
+      if (canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
       else {
         val nextBestCity: City = currentPath.chooseBestCity(currentPath.cities.last)
         oneStepDeeper(currentPath.addCity(nextBestCity))
@@ -28,7 +28,7 @@ object AntAlgorithmSolver extends App {
       }
     }
     antPaths.foreach(_.leaveScent)
-    scentMap.mapValuesInPlace { (_, value) => value * (1.0 - vaporCoeff ) }
+    scentMap.mapValuesInPlace { (_, value) => value * (1.0 - vaporCoeff) }
   }
   println("Found best path:")
   println(bestPath.cities.map(_.id).mkString("->"))
@@ -37,4 +37,3 @@ object AntAlgorithmSolver extends App {
   Image.draw(bestPath)
   println(s"Completed the program.")
 }
-
