@@ -33,7 +33,8 @@ object AntAlgorithmSolver extends App {
   println("Found best path:")
   println(bestPath.cities.map(_.id).mkString("->"))
   println(s"with distance: ${bestPath.distance}.")
-  println(s"Completed the program.")
+  println(s"Started drawing.")
   Image.draw(bestPath)
+  println(s"Completed the program.")
 }
 

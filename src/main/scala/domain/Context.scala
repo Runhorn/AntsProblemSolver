@@ -9,8 +9,8 @@ object Context {
   val alpha: Int = 1
   val beta: Int = 5
   val vaporCoeff: Double = 0.1
-  val ants: Int = 5
-  val iterations: Int = 100
+  val ants: Int = 10
+  val iterations: Int = 500
   //best should be 10628
 
   val cities: Seq[City] =
