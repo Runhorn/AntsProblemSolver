@@ -1,9 +1,12 @@
-import java.awt.image.BufferedImage
-import java.awt.Color
-import javax.imageio.ImageIO
-import java.io.File
+package utils
 
-import Context.cities
+import domain.Context.cities
+import domain.Path
+
+import java.awt.Color
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
 
 object Image {
   private val width: Int = 9000

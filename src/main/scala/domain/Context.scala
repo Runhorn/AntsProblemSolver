@@ -1,6 +1,9 @@
+package domain
+
+import scala.collection.mutable
+import scala.collection.immutable.{Map, Seq, Set}
 import scala.io.Source
 import scala.util.Random
-import scala.collection._
 
 object Context {
   val alpha: Int = 1

@@ -1,4 +1,6 @@
-import Context.{ cities, startingPoint }
+import domain.{City, Path}
+import domain.Context.{startingPoint, cities}
+import utils.Image
 
 object AntAlgorithmSolver extends App {
   private val ants: Int = 1

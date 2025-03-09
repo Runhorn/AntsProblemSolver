@@ -1,3 +1,5 @@
+package domain
+
 import org.scalatest.funsuite.AnyFunSuite
 
 class CityTest extends AnyFunSuite {

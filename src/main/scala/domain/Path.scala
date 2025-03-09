@@ -1,5 +1,7 @@
-import Context._
-import scala.collection._
+package domain
+
+import scala.collection.immutable.{Seq, Set}
+import Context.{cityMap, scentMap, alpha, beta}
 
 case class Path(cities: Seq[City]) {
   def addCity(city: City): Path = Path(cities :+ city)
