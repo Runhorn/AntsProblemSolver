@@ -1,4 +1,4 @@
-import Context.cityMap
+import Context.{ cityMap, scentMap }
 import scala.collection._
 
 case class Path(cities: Seq[City]) {

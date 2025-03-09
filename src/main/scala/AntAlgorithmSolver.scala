@@ -4,7 +4,7 @@ object AntAlgorithmSolver extends App {
   private val ants: Int = 1
   private val alpha: Int = 1
   private val beta: Int = 5
-  private val iterations: Int = 10
+  private val iterations: Int = 100
 
   private def traverseWithAnt(cities: Set[City]): Path = {
     def oneStepDeeper(currentPath: Path): Path = {
@@ -32,5 +32,6 @@ object AntAlgorithmSolver extends App {
   println(bestPath.cities.map(_.id).mkString("->"))
   println(s"with distance: ${bestPath.distance}.")
   println(s"Completed the program.")
+  Image.draw(bestPath)
 }
 
