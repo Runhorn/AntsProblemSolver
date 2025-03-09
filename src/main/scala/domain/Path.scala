@@ -1,6 +1,5 @@
 package domain
 
-import scala.collection.immutable.{Seq, Set}
 import Context.{alpha, beta, cityMap, scentMap}
 
 import scala.util.Random
