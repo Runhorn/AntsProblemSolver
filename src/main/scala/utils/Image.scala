@@ -3,7 +3,7 @@ package utils
 import domain.Context.cities
 import domain.Path
 
-import java.awt.Color
+import java.awt.{BasicStroke, Color}
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
@@ -11,7 +11,7 @@ import javax.imageio.ImageIO
 object Image {
   private val width: Int = 9000
   private val height: Int = 6000
-  private val pointSize = 50
+  private val pointSize = 70
 
   def draw(path: Path): Unit = {
     val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
@@ -25,8 +25,9 @@ object Image {
     }
 
     graphics2D.setPaint(Color.BLUE)
+    graphics2D.setStroke(new BasicStroke(10))
     if (path.cities.length > 1) {
-      for (i <- 0 until cities.length - 1) {
+      for (i <- 0 until cities.length) {
         val c1 = path.cities(i)
         val c2 = path.cities(i + 1)
         graphics2D.setPaint(Color.BLUE)

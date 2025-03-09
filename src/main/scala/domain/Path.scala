@@ -25,17 +25,16 @@ case class Path(cities: Seq[City]) {
     }
 
     val totalWeight: Double = weightedChoices.map(_._2).sum
-    val probabilities: Seq[(City, Double)] = weightedChoices.map { case (city, weight) => (city, weight / totalWeight) }
+    //val probabilities: Seq[(City, Double)] = weightedChoices.map { case (city, weight) => (city, weight / totalWeight) }
 
     def takeRandomAtChance: City = {
-      val m = if(totalWeight < 1) 1 else totalWeight.toInt
-      val r = Random.nextInt(m)
+      val r = Random.nextDouble() * totalWeight
       var cumulative = 0.0
-      probabilities.find {
+      weightedChoices.find {
         case (_, probability) =>
           cumulative += probability
           cumulative >= r
-      }.map(_._1).getOrElse(probabilities.last._1)
+      }.map(_._1).getOrElse(weightedChoices.last._1)
     }
 
     takeRandomAtChance

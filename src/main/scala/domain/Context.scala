@@ -7,10 +7,11 @@ import scala.util.Random
 
 object Context {
   val alpha: Int = 1
-  val beta: Int = 3
-  val vaporCoeff: Double = 10.0
-  val ants: Int = 10
-  val iterations: Int = 1000
+  val beta: Int = 5
+  val vaporCoeff: Double = 0.1
+  val ants: Int = 5
+  val iterations: Int = 100
+  //best should be 10628
 
   val cities: Seq[City] =
     Source.fromFile("src/main/resources/ATT48.txt")
