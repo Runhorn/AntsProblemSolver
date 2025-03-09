@@ -1,11 +1,8 @@
 import domain.{City, Path}
-import domain.Context.{startingPoint, cities}
+import domain.Context.{startingPoint, cities, iterations, ants}
 import utils.Image
 
 object AntAlgorithmSolver extends App {
-  private val ants: Int = 1
-  private val iterations: Int = 1000
-
   private def traverseWithAnt(cities: Set[City]): Path = {
     def oneStepDeeper(currentPath: Path): Path = {
       val canTravelTo = cities.diff(currentPath.cities.toSet)
@@ -19,11 +16,14 @@ object AntAlgorithmSolver extends App {
   }
 
   var bestPath: Path = Path(Seq.empty[City])
+
   for (i <- 1 to iterations) {
-    val candidate: Path = traverseWithAnt(cities.toSet)
-    if(bestPath.cities.isEmpty || bestPath.distance > candidate.distance) {
-      bestPath = candidate
-      println(s"New record: ${candidate.distance} at iteration $i")
+    for (j <- 1 to ants) {
+      val candidate: Path = traverseWithAnt(cities.toSet)
+      if (bestPath.cities.isEmpty || bestPath.distance > candidate.distance) {
+        bestPath = candidate
+        println(s"New record: ${candidate.distance} at iteration $i and ant $j")
+      }
     }
   }
   println("Found best path:")
