@@ -2,22 +2,18 @@ import Context.{ cities, startingPoint }
 
 object AntAlgorithmSolver extends App {
   private val ants: Int = 1
-  private val alpha: Int = 1
-  private val beta: Int = 5
-  private val iterations: Int = 100
+  private val iterations: Int = 1000
 
   private def traverseWithAnt(cities: Set[City]): Path = {
     def oneStepDeeper(currentPath: Path): Path = {
-      val canTravelTo = cities.filterNot(currentPath.cities.contains)
+      val canTravelTo = cities.diff(currentPath.cities.toSet)
       if(canTravelTo.isEmpty) currentPath
       else {
-        canTravelTo
-          .map(currentPath.addCity)
-          .map(oneStepDeeper)
-          .minBy(_.distance)
+        val nextBestCity: City = currentPath.chooseBestCity(currentPath.cities.last)
+        oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }
-    oneStepDeeper(Path(startingPoint))
+    oneStepDeeper(Path(Seq(startingPoint)))
   }
 
   var bestPath: Path = Path(Seq.empty[City])

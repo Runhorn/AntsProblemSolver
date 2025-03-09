@@ -1,24 +1,29 @@
-import Context.{ cityMap, scentMap }
+import Context._
 import scala.collection._
 
 case class Path(cities: Seq[City]) {
-  def addCity(city: City): Path = Path(cities :+ chooseBestCity)
+  def addCity(city: City): Path = Path(cities :+ city)
 
   def distance: Int = (cities zip cities.tail)
-    .map{
-      case x => cityMap.get(immutable.Set(x._1, x._2)).get
-    }.sum
+    .map { case (a,b) => cityMap.getOrElse(Set(a,b), Int.MaxValue) }
+    .sum
 
-  def chooseBestCity(): City = {
-    val bestForCity = mutable.Map[City, (Set[City], Int)]()
+  def chooseBestCity(city: City): City = {
+    val availableCities = cityMap.keys.flatten.filterNot(cities.contains).toSeq
 
-    for ((cities, distance) <- cityMap) {
-      for (city <- cities) {
-        if (!bestForCity.contains(city) || bestForCity(city)._2 > distance) {
-          bestForCity(city) = (cities, distance)
-        }
-      }
+    if (availableCities.isEmpty) return city
+
+    val weightedChoices = availableCities.map { nextCity =>
+      val distance = cityMap(Set(city, nextCity))
+      val pheromone = scentMap(Set(city, nextCity))
+      val attractiveness = math.pow(pheromone, alpha) * math.pow(1.0 / distance, beta)
+      (nextCity, attractiveness)
     }
-    bestForCity.get(cities.last).get._1.head
+
+    val totalWeight = weightedChoices.map(_._2).sum
+    val probabilities = weightedChoices.map { case (city, weight) => (city, weight / totalWeight) }
+
+    val selectedCity = probabilities.maxBy(_._2)._1
+    selectedCity
   }
 }

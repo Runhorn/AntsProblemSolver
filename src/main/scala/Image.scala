@@ -22,11 +22,13 @@ object Image {
     }
 
     graphics2D.setPaint(Color.BLUE)
-    for(i <- 0 until cities.length - 1) {
-      val c1 = path.cities(i)
-      val c2 = path.cities(i + 1)
-      graphics2D.setPaint(Color.BLUE)
-      graphics2D.drawLine(c1.x, height - c1.y, c2.x, height - c2.y)
+    if (path.cities.length > 1) {
+      for (i <- 0 until cities.length - 1) {
+        val c1 = path.cities(i)
+        val c2 = path.cities(i + 1)
+        graphics2D.setPaint(Color.BLUE)
+        graphics2D.drawLine(c1.x, height - c1.y, c2.x, height - c2.y)
+      }
     }
 
     graphics2D.dispose()
