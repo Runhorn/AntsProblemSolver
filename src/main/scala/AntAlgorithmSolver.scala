@@ -1,39 +1,44 @@
-import domain.{ City, Path }
-import domain.Context.{ ants, cities, iterations, scentMap, startingPoint, vaporCoeff }
-import utils.Image
+import domain.Context.cities
+
+import scopt.OParser
 
 object AntAlgorithmSolver extends App {
-  private def traverseWithAnt(cities: Set[City]): Path = {
-    def oneStepDeeper(currentPath: Path): Path = {
-      val canTravelTo = cities.diff(currentPath.cities.toSet)
-      if (canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
-      else {
-        val nextBestCity: City = currentPath.chooseBestCity(currentPath.cities.last)
-        oneStepDeeper(currentPath.addCity(nextBestCity))
-      }
-    }
-    oneStepDeeper(Path(Seq(startingPoint)))
+  val configParser = OParser.builder[Config]
+  val parser = {
+    import configParser._
+    OParser.sequence(
+      opt[Int]("alpha")
+        .action((x, c) => c.copy(alpha = x))
+        .text("Współczynnik alfa"),
+
+      opt[Int]("beta")
+        .action((x, c) => c.copy(beta = x))
+        .text("Współczynnik"),
+
+      opt[Int]("ants")
+        .action((x, c) => c.copy(ants = x))
+        .text("Liczba mrówek"),
+
+      opt[Int]("iterations")
+        .action((x, c) => c.copy(iterations = x))
+        .text("Liczba iteracji"),
+
+      opt[Double]("vaporCoeff")
+        .action((x, c) => c.copy(vaporCoeff = x))
+        .text("Współczynnik parowania")
+    )
   }
 
-  var bestPath: Path = Path(Seq.empty[City])
-
-  for (i <- 1 to iterations) {
-    var antPaths: Seq[Path] = Seq.empty[Path]
-    for (j <- 1 to ants) {
-      val candidate: Path = traverseWithAnt(cities.toSet)
-      antPaths = antPaths :+ candidate
-      if (bestPath.cities.isEmpty || bestPath.distance > candidate.distance) {
-        bestPath = candidate
-        println(s"New record: ${candidate.distance} at iteration $i and ant $j")
-      }
-    }
-    antPaths.foreach(_.leaveScent)
-    scentMap.mapValuesInPlace { (_, value) => value * (1.0 - vaporCoeff) }
+  OParser.parse(parser, args, Config()) match {
+    case Some(config) =>
+      val solver = new Solver(cities.toSet, config)
+      val bestPath = solver.solve
+      println("Found best path:")
+      println(bestPath.cities.map(_.id).mkString("->"))
+      println(s"with distance: ${bestPath.distance}.")
+      println(bestPath)
+      println(s"Started drawing.")
+    case _ =>
+        println("Podano nieprawidłowe argumenty! Użyj --help, aby zobaczyć dostępne.")
   }
-  println("Found best path:")
-  println(bestPath.cities.map(_.id).mkString("->"))
-  println(s"with distance: ${bestPath.distance}.")
-  println(s"Started drawing.")
-  Image.draw(bestPath)
-  println(s"Completed the program.")
 }

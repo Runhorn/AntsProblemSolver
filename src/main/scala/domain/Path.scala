@@ -1,6 +1,6 @@
 package domain
 
-import Context.{ alpha, beta, cityMap, scentMap }
+import Context.{cityMap, scentMap }
 
 import scala.util.Random
 
@@ -11,7 +11,7 @@ case class Path(cities: Seq[City]) {
     cityMap.getOrElse(Set(a, b), Int.MaxValue)
   }.sum
 
-  def chooseBestCity(city: City): City = {
+  def chooseBestCity(city: City, alpha: Int, beta: Int): City = {
     val availableCities = cityMap.keys.flatten.filterNot(cities.contains).toSeq
 
     if (availableCities.isEmpty) return city
