@@ -8,7 +8,7 @@ import scala.util.Random
 object Context {
   val cities: Seq[City] =
     Source
-      .fromFile("src/main/resources/ATT48.txt")
+      .fromFile("ATT48.txt")
       .getLines()
       .toSeq
       .map(e => e.trim.split("\\s+"))

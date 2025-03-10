@@ -10,19 +10,15 @@ object AntAlgorithmSolver extends App {
       opt[Int]("alpha")
         .action((x, c) => c.copy(alpha = x))
         .text("Współczynnik alfa"),
-
       opt[Int]("beta")
         .action((x, c) => c.copy(beta = x))
         .text("Współczynnik"),
-
       opt[Int]("ants")
         .action((x, c) => c.copy(ants = x))
         .text("Liczba mrówek"),
-
       opt[Int]("iterations")
         .action((x, c) => c.copy(iterations = x))
         .text("Liczba iteracji"),
-
       opt[Double]("vaporCoeff")
         .action((x, c) => c.copy(vaporCoeff = x))
         .text("Współczynnik parowania")
@@ -31,14 +27,12 @@ object AntAlgorithmSolver extends App {
 
   OParser.parse(parser, args, Config()) match {
     case Some(config) =>
-      val solver = new Solver(cities.toSet, config)
+      val solver   = new Solver(cities.toSet, config)
       val bestPath = solver.solve
-      println("Found best path:")
+      println("Znaleziono najlepszą scieżkę:")
       println(bestPath.cities.map(_.id).mkString("->"))
-      println(s"with distance: ${bestPath.distance}.")
-      println(bestPath)
-      println(s"Started drawing.")
+      println(s"o długosci: ${bestPath.distance}.")
     case _ =>
-        println("Podano nieprawidłowe argumenty! Użyj --help, aby zobaczyć dostępne.")
+      println("Podano nieprawidłowe argumenty! Użyj --help, aby zobaczyć dostępne.")
   }
 }

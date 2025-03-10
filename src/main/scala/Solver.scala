@@ -1,6 +1,5 @@
-import domain.{City, Path}
-import domain.Context.{scentMap, startingPoint}
-
+import domain.{ City, Path }
+import domain.Context.{ scentMap, startingPoint }
 
 class Solver(cities: Set[City], config: Config) {
   private def traverseWithAnt(cities: Set[City]): Path = {
@@ -8,7 +7,8 @@ class Solver(cities: Set[City], config: Config) {
       val canTravelTo = cities.diff(currentPath.cities.toSet)
       if (canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
       else {
-        val nextBestCity: City = currentPath.chooseBestCity(currentPath.cities.last, config.alpha, config.beta)
+        val nextBestCity: City =
+          currentPath.chooseBestCity(currentPath.cities.last, config.alpha, config.beta)
         oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }

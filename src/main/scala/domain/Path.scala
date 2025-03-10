@@ -1,6 +1,6 @@
 package domain
 
-import Context.{cityMap, scentMap }
+import Context.{ cityMap, scentMap }
 
 import scala.util.Random
 
