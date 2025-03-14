@@ -12,21 +12,18 @@ class Solver(cities: Set[City], config: Config) {
         oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }
-    oneStepDeeper(Path(Seq(startingPoint)))
+    oneStepDeeper(Path(List(startingPoint)))
   }
 
   def solve: Path = {
-    var bestPath: Path = Path(Seq.empty[City])
+    var bestPath: Path = Path(List.empty[City])
 
     for (i <- 1 to config.iterations) {
-      var antPaths: Seq[Path] = Seq.empty[Path]
+      var antPaths: List[Path] = List.empty[Path]
       for (j <- 1 to config.ants) {
         val candidate: Path = traverseWithAnt(cities)
         antPaths = antPaths :+ candidate
-        if (bestPath.cities.isEmpty || bestPath.distance > candidate.distance) {
-          bestPath = candidate
-          println(s"New record: ${candidate.distance} at iteration $i and ant $j")
-        }
+        if (bestPath.cities.isEmpty || bestPath.distance > candidate.distance) bestPath = candidate
       }
       antPaths.foreach(_.leaveScent)
       scentMap.mapValuesInPlace { (_, value) => value * (1.0 - config.vaporCoeff) }

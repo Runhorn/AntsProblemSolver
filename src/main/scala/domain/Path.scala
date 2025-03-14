@@ -4,7 +4,7 @@ import Context.{ cityMap, scentMap }
 
 import scala.util.Random
 
-case class Path(cities: Seq[City]) {
+case class Path(cities: List[City]) {
   def addCity(city: City): Path = Path(cities :+ city)
 
   def distance: Int = (cities zip cities.tail).map { case (a, b) =>
@@ -12,19 +12,23 @@ case class Path(cities: Seq[City]) {
   }.sum
 
   def chooseBestCity(city: City, alpha: Int, beta: Int): City = {
-    val availableCities = cityMap.keys.flatten.filterNot(cities.contains).toSeq
+    val availableCities = cityMap.keys.flatten.filterNot(cities.contains)
 
     if (availableCities.isEmpty) return city
 
-    val weightedChoices = availableCities.map { nextCity =>
-      val distance       = cityMap(Set(city, nextCity))
-      val pheromone      = scentMap(Set(city, nextCity))
-      val attractiveness = math.pow(pheromone, alpha) * math.pow(1.0 / distance, beta)
-      (nextCity, attractiveness)
-    }
+    val weightedChoices = availableCities.flatMap { nextCity =>
+      val distance  = cityMap.getOrElse(Set(city, nextCity), Int.MaxValue)
+      val pheromone = scentMap.getOrElse(Set(city, nextCity), 1.0)
+
+      if (distance == Int.MaxValue) None
+      else {
+        val attractiveness = math.pow(pheromone, alpha) * math.pow(1.0 / distance, beta)
+        Some(nextCity -> attractiveness)
+      }
+    }.toList
 
     val totalWeight: Double = weightedChoices.map(_._2).sum
-    val probabilities: Seq[(City, Double)] = weightedChoices.map { case (city, weight) =>
+    val probabilities: List[(City, Double)] = weightedChoices.map { case (city, weight) =>
       (city, weight / totalWeight)
     }
 
@@ -37,13 +41,13 @@ case class Path(cities: Seq[City]) {
           cumulative >= r
         }
         .map(_._1)
-        .getOrElse(probabilities.last._1)
+        .getOrElse(probabilities.head._1)
     }
 
     takeRandomAtChance
   }
 
-  def leaveScent: Unit = {
+  def leaveScent(): Unit = {
     for (i <- 0 until cities.length - 1) {
       val route               = Set(cities(i), cities(i + 1))
       val scentAmount: Double = 1.0 / cityMap(route)

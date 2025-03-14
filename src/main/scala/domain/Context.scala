@@ -6,17 +6,17 @@ import scala.io.Source
 import scala.util.Random
 
 object Context {
-  val cities: Seq[City] =
+  val cities: List[City] =
     Source
       .fromFile("ATT48.txt")
       .getLines()
-      .toSeq
+      .toList
       .map(e => e.trim.split("\\s+"))
       .map(x => City(x(0).toInt, x(1).toInt, x(2).toInt))
 
   val cityMap: Map[Set[City], Int] = cities
     .combinations(2)
-    .map { case Seq(cityA: City, cityB: City) =>
+    .map { case List(cityA: City, cityB: City) =>
       Set(cityA, cityB) -> cityA.distanceTo(cityB)
     }
     .toMap
@@ -24,11 +24,11 @@ object Context {
   val scentMap: mutable.Map[Set[City], Double] = collection.mutable.Map(
     cities
       .combinations(2)
-      .map { case Seq(cityA: City, cityB: City) =>
+      .map { case List(cityA: City, cityB: City) =>
         Set(cityA, cityB) -> 1.0
       }
       .toMap
-      .toSeq: _*
+      .toList: _*
   )
 
   def startingPoint: City = Random.shuffle(cities).head

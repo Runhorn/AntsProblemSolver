@@ -1,4 +1,5 @@
 import domain.Context.cities
+import utils.Image
 
 import scopt.OParser
 
@@ -27,11 +28,8 @@ object AntAlgorithmSolver extends App {
 
   OParser.parse(parser, args, Config()) match {
     case Some(config) =>
-      val solver   = new Solver(cities.toSet, config)
-      val bestPath = solver.solve
-      println("Znaleziono najlepszą scieżkę:")
-      println(bestPath.cities.map(_.id).mkString("->"))
-      println(s"o długosci: ${bestPath.distance}.")
+      val bestPath = new Solver(cities.toSet, config).solve
+      Image.draw(bestPath)
     case _ =>
       println("Podano nieprawidłowe argumenty! Użyj --help, aby zobaczyć dostępne.")
   }
