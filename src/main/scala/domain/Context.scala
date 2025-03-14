@@ -31,5 +31,5 @@ object Context {
       .toList: _*
   )
 
-  def startingPoint: City = Random.shuffle(cities).head
+  def startingPath: Path = Path(List(Random.shuffle(cities).head))
 }

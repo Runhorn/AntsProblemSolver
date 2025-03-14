@@ -1,5 +1,5 @@
 import domain.{City, Path}
-import domain.Context.{cityMap, scentMap, startingPoint}
+import domain.Context.{cityMap, scentMap, startingPath}
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -29,13 +29,12 @@ class Solver(cities: Set[City], config: Config) {
       .getOrElse(probabilities.head._1)
   }
 
-  private def chooseBestCity(choices: Set[(City, Double)]): City = {
+  private def chooseBestCity(choices: Set[(City, Double)]): City =
     takeRandomAtChance(
       choices.map { case (city, weight) =>
         (city, weight / choices.map(_._2).sum)
       }
     )
-  }
 
   private def traverseWithAnt(cities: Set[City]): Path = {
     @tailrec
@@ -48,7 +47,7 @@ class Solver(cities: Set[City], config: Config) {
         oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }
-    oneStepDeeper(Path(List(startingPoint)))
+    oneStepDeeper(startingPath)
   }
 
   def solve: Path = {
