@@ -8,7 +8,7 @@ class Solver(cities: Set[City], config: Config) {
       if (canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
       else {
         val nextBestCity: City =
-          currentPath.chooseBestCity(currentPath.cities.last, config.alpha, config.beta)
+          currentPath.chooseBestCity(canTravelTo, currentPath.cities.last, config.alpha, config.beta)
         oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }

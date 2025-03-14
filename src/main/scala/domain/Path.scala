@@ -11,7 +11,7 @@ case class Path(cities: List[City]) {
     cityMap.getOrElse(Set(a, b), Int.MaxValue)
   }.sum
 
-  def weightedChoices(availableCities: List[City], city: City, alpha: Int, beta: Int): List[(City, Double)] =
+  def weightedChoices(availableCities: Set[City], city: City, alpha: Int, beta: Int): Set[(City, Double)] =
     availableCities.flatMap { nextCity =>
       val distance  = cityMap.getOrElse(Set(city, nextCity), Int.MaxValue)
       val pheromone = scentMap.getOrElse(Set(city, nextCity), 1.0)
@@ -23,7 +23,7 @@ case class Path(cities: List[City]) {
       }
     }
 
-  def takeRandomAtChance(probabilities: List[(City, Double)]): City = {
+  def takeRandomAtChance(probabilities: Set[(City, Double)]): City = {
     val r          = Random.nextDouble()
     var cumulative = 0.0
     probabilities
@@ -35,18 +35,17 @@ case class Path(cities: List[City]) {
       .getOrElse(probabilities.head._1)
   }
 
-  def chooseBestCity(city: City, alpha: Int, beta: Int): City = {
-    val availableCities = cityMap.keys.flatten.filterNot(cities.contains).toList
-
+  def chooseBestCity(availableCities: Set[City], city: City, alpha: Int, beta: Int): City = {
     if (availableCities.isEmpty) return city
 
     val choices = weightedChoices(availableCities, city, alpha, beta)
     val totalWeight: Double = choices.map(_._2).sum
-    val probabilities: List[(City, Double)] = choices.map { case (city, weight) =>
-      (city, weight / totalWeight)
-    }
-    
-    takeRandomAtChance(probabilities)
+
+    takeRandomAtChance(
+      choices.map { case (city, weight) =>
+        (city, weight / totalWeight)
+      }
+    )
   }
 
   def leaveScent(): Unit = {
