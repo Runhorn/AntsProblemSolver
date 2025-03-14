@@ -11,12 +11,8 @@ case class Path(cities: List[City]) {
     cityMap.getOrElse(Set(a, b), Int.MaxValue)
   }.sum
 
-  def chooseBestCity(city: City, alpha: Int, beta: Int): City = {
-    val availableCities = cityMap.keys.flatten.filterNot(cities.contains)
-
-    if (availableCities.isEmpty) return city
-
-    val weightedChoices = availableCities.flatMap { nextCity =>
+  def weightedChoices(availableCities: List[City], city: City, alpha: Int, beta: Int): List[(City, Double)] =
+    availableCities.flatMap { nextCity =>
       val distance  = cityMap.getOrElse(Set(city, nextCity), Int.MaxValue)
       val pheromone = scentMap.getOrElse(Set(city, nextCity), 1.0)
 
@@ -25,26 +21,32 @@ case class Path(cities: List[City]) {
         val attractiveness = math.pow(pheromone, alpha) * math.pow(1.0 / distance, beta)
         Some(nextCity -> attractiveness)
       }
-    }.toList
+    }
 
-    val totalWeight: Double = weightedChoices.map(_._2).sum
-    val probabilities: List[(City, Double)] = weightedChoices.map { case (city, weight) =>
+  def takeRandomAtChance(probabilities: List[(City, Double)]): City = {
+    val r          = Random.nextDouble()
+    var cumulative = 0.0
+    probabilities
+      .find { case (_, probability) =>
+        cumulative += probability
+        cumulative >= r
+      }
+      .map(_._1)
+      .getOrElse(probabilities.head._1)
+  }
+
+  def chooseBestCity(city: City, alpha: Int, beta: Int): City = {
+    val availableCities = cityMap.keys.flatten.filterNot(cities.contains).toList
+
+    if (availableCities.isEmpty) return city
+
+    val choices = weightedChoices(availableCities, city, alpha, beta)
+    val totalWeight: Double = choices.map(_._2).sum
+    val probabilities: List[(City, Double)] = choices.map { case (city, weight) =>
       (city, weight / totalWeight)
     }
-
-    val takeRandomAtChance: City = {
-      val r          = Random.nextDouble()
-      var cumulative = 0.0
-      probabilities
-        .find { case (_, probability) =>
-          cumulative += probability
-          cumulative >= r
-        }
-        .map(_._1)
-        .getOrElse(probabilities.head._1)
-    }
-
-    takeRandomAtChance
+    
+    takeRandomAtChance(probabilities)
   }
 
   def leaveScent(): Unit = {
