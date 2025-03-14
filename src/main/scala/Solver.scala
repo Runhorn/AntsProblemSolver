@@ -18,14 +18,14 @@ class Solver(cities: Set[City], config: Config) {
     }
 
   private def takeRandomAtChance(probabilities: Set[(City, Double)]): City = {
-    val r          = Random.nextDouble()
-    var cumulative = 0.0
+    val r = Random.nextDouble()
     probabilities
-      .find { case (_, probability) =>
-        cumulative += probability
-        cumulative >= r
+      .foldLeft((Option.empty[City], 0.0)) { case ((selected, cumulative), (city, probability)) =>
+        val newCumulative = cumulative + probability
+        if (selected.isEmpty && newCumulative >= r) (Some(city), newCumulative)
+        else (selected, newCumulative)
       }
-      .map(_._1)
+      ._1
       .getOrElse(probabilities.head._1)
   }
 
@@ -50,19 +50,12 @@ class Solver(cities: Set[City], config: Config) {
     oneStepDeeper(startingPath)
   }
 
-  def solve: Path = {
-    var bestPath: Path = Path(List.empty[City])
-
-    for (i <- 1 to config.iterations) {
-      var antPaths: List[Path] = List.empty[Path]
-      for (j <- 1 to config.ants) {
-        val candidate: Path = traverseWithAnt(cities)
-        antPaths = antPaths :+ candidate
-        if (bestPath.cities.isEmpty || bestPath.distance > candidate.distance) bestPath = candidate
-      }
+  def solve: Path =
+    (1 to config.iterations).foldLeft(Path(List.empty[City])) { (bestPath, _) =>
+      val antPaths = (1 to config.ants).map(_ => traverseWithAnt(cities)).toList
+      val newBestPath = antPaths.minByOption(_.distance).getOrElse(bestPath)
       antPaths.foreach(_.leaveScent())
       scentMap.mapValuesInPlace { (_, value) => value * (1.0 - config.vaporCoeff) }
+      newBestPath
     }
-    bestPath
-  }
 }
