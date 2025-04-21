@@ -1,11 +1,11 @@
-ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / version := "0.1.1-SNAPSHOT"
 
 ThisBuild / scalaVersion := "2.13.15"
 
 lazy val root = (project in file("."))
   .settings(
     name := "Ants",
-    version := "1.0",
+    version := "1.1",
     scalaVersion := "2.13.15",
     mainClass in Compile := Some("AntAlgorithmSolver")
   )

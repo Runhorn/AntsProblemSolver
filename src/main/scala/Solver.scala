@@ -1,5 +1,5 @@
-import domain.{City, Path}
-import domain.Context.{cityMap, scentMap, startingPath}
+import domain.{ City, Path }
+import domain.Context.{ cityMap, scentMap, startingPath }
 
 import scala.annotation.tailrec
 import scala.util.Random
@@ -12,7 +12,8 @@ class Solver(cities: Set[City], config: Config) {
 
       if (distance == Int.MaxValue) None
       else {
-        val attractiveness = math.pow(pheromone, config.alpha) * math.pow(1.0 / distance, config.beta)
+        val attractiveness =
+          math.pow(pheromone, config.alpha) * math.pow(1.0 / distance, config.beta)
         Some(nextCity -> attractiveness)
       }
     }
@@ -52,7 +53,7 @@ class Solver(cities: Set[City], config: Config) {
 
   def solve: Path =
     (1 to config.iterations).foldLeft(Path(List.empty[City])) { (bestPath, _) =>
-      val antPaths = (1 to config.ants).map(_ => traverseWithAnt(cities)).toList
+      val antPaths    = (1 to config.ants).map(_ => traverseWithAnt(cities)).toList
       val newBestPath = antPaths.minByOption(_.distance).getOrElse(bestPath)
       antPaths.foreach(_.leaveScent())
       scentMap.mapValuesInPlace { (_, value) => value * (1.0 - config.vaporCoeff) }
