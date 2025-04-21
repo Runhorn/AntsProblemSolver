@@ -26,7 +26,10 @@ object AntAlgorithmSolver extends App {
   }
 
   OParser.parse(parser, args, Config()) match {
-    case Some(config) => println(new Solver(cities.toSet, config).solve.cities.map(c => c.id))
+    case Some(config) =>
+      val bestPath = new Solver(cities.toSet, config).solve
+      println(bestPath.cities.map(c => c.id))
+      println(bestPath.distance)
     case _ => println("Podano nieprawidłowe argumenty! Użyj --help, aby zobaczyć dostępne.")
   }
 }
