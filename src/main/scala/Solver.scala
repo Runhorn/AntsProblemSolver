@@ -2,7 +2,6 @@ import domain.{ City, Path }
 import domain.Context.{ cityMap, scentMap, startingPath }
 
 import scala.annotation.tailrec
-import scala.util.Random
 
 class Solver(cities: Set[City], config: Config) {
   private def weightedChoices(availableCities: Set[City], city: City): Set[(City, Double)] =
@@ -18,25 +17,6 @@ class Solver(cities: Set[City], config: Config) {
       }
     }
 
-  private def takeRandomAtChance(probabilities: Set[(City, Double)]): City = {
-    val r = Random.nextDouble()
-    probabilities
-      .foldLeft((Option.empty[City], 0.0)) { case ((selected, cumulative), (city, probability)) =>
-        val newCumulative = cumulative + probability
-        if (selected.isEmpty && newCumulative >= r) (Some(city), newCumulative)
-        else (selected, newCumulative)
-      }
-      ._1
-      .getOrElse(probabilities.head._1)
-  }
-
-  private def chooseBestCity(choices: Set[(City, Double)]): City =
-    takeRandomAtChance(
-      choices.map { case (city, weight) =>
-        (city, weight / choices.map(_._2).sum)
-      }
-    )
-
   private def traverseWithAnt(cities: Set[City]): Path = {
     @tailrec
     def oneStepDeeper(currentPath: Path): Path = {
@@ -44,7 +24,7 @@ class Solver(cities: Set[City], config: Config) {
       if (canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
       else {
         val nextBestCity: City =
-          chooseBestCity(weightedChoices(canTravelTo, currentPath.cities.last))
+          config.strategy.chooseBestCity(weightedChoices(canTravelTo, currentPath.cities.last))
         oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }

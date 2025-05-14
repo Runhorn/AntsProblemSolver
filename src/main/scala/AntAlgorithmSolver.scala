@@ -1,8 +1,12 @@
 import domain.Context.cities
-
-import scopt.OParser
+import scopt.{OParser, Read}
 
 object AntAlgorithmSolver extends App {
+  implicit val strategyRead: Read[Strategy] = Read.reads {
+    case "WeightedRandom" => WeightedRandom
+    case "Naive"          => Naive
+    case other            => throw new IllegalArgumentException(s"Niewspierana strategia: $other")
+  }
   val configParser = OParser.builder[Config]
   val parser = {
     import configParser._
@@ -21,7 +25,10 @@ object AntAlgorithmSolver extends App {
         .text("Liczba iteracji"),
       opt[Double]("vaporCoeff")
         .action((x, c) => c.copy(vaporCoeff = x))
-        .text("Współczynnik parowania")
+        .text("Współczynnik parowania"),
+      opt[Strategy]("strategy")
+        .action((x, c) => c.copy(strategy = x))
+        .text("Wybór strategii")
     )
   }
 

@@ -3,5 +3,7 @@ case class Config(
     beta: Int = 5,
     ants: Int = 5,
     iterations: Int = 10,
-    vaporCoeff: Double = 0.3
+    vaporCoeff: Double = 0.3,
+    strategy: Strategy = WeightedRandom,
+    bestPathCoeff: Double = 1.0
 )
