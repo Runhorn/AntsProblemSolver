@@ -11,7 +11,12 @@ class Solver(cities: Set[City], config: Config) {
       if (canTravelTo.isEmpty) currentPath.addCity(currentPath.cities.head)
       else {
         val nextBestCity: City =
-          config.strategy.chooseBestCity(canTravelTo, currentPath.cities.last, config.alpha, config.beta)
+          config.strategy.chooseBestCity(
+            canTravelTo,
+            currentPath.cities.last,
+            config.alpha,
+            config.beta
+          )
         oneStepDeeper(currentPath.addCity(nextBestCity))
       }
     }
@@ -24,7 +29,8 @@ class Solver(cities: Set[City], config: Config) {
       val newBestPath = antPaths.minByOption(_.distance).getOrElse(bestPath)
       config.strategy match {
         case Naive => ()
-        case WeightedRandom => antPaths.foreach(_.leaveScent())
+        case WeightedRandom =>
+          antPaths.foreach(_.leaveScent())
           scentMap.mapValuesInPlace { (_, value) => value * (1.0 - config.vaporCoeff) }
       }
       newBestPath
