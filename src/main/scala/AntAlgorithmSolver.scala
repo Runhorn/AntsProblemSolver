@@ -1,5 +1,5 @@
 import domain.Context.cities
-import scopt.{OParser, Read}
+import scopt.{ OParser, Read }
 
 object AntAlgorithmSolver extends App {
   implicit val strategyRead: Read[Strategy] = Read.reads {
