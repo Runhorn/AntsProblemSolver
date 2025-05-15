@@ -1,18 +1,35 @@
 import domain.City
+import domain.Context.{cityMap, scentMap}
 
 import scala.util.Random
 
 sealed trait Strategy {
-  def chooseBestCity(choices: Set[(City, Double)]): City
+  def chooseBestCity(availableCities: Set[City], city: City, alpha: Int, beta: Int): City
+  def weightedChoices(availableCities: Set[City], city: City, alpha: Int, beta: Int): Set[(City, Double)]
 }
 
 case object WeightedRandom extends Strategy {
-  def chooseBestCity(choices: Set[(City, Double)]): City =
+  def chooseBestCity(availableCities: Set[City], city: City, alpha: Int, beta: Int): City = {
+    val choices = weightedChoices(availableCities, city, alpha, beta)
     takeRandomAtChance(
       choices.map { case (city, weight) =>
         (city, weight / choices.map(_._2).sum)
       }
     )
+  }
+
+  def weightedChoices(availableCities: Set[City], city: City, alpha: Int, beta: Int): Set[(City, Double)] =
+    availableCities.flatMap { nextCity =>
+      val distance  = cityMap.getOrElse(Set(city, nextCity), Int.MaxValue)
+      val pheromone = scentMap.getOrElse(Set(city, nextCity), 1.0)
+
+      if (distance == Int.MaxValue) None
+      else {
+        val attractiveness =
+          math.pow(pheromone, alpha) * math.pow(1.0 / distance, beta)
+        Some(nextCity -> attractiveness)
+      }
+    }
 
   private def takeRandomAtChance(probabilities: Set[(City, Double)]): City = {
     val r = Random.nextDouble()
@@ -28,5 +45,13 @@ case object WeightedRandom extends Strategy {
 }
 
 case object Naive extends Strategy {
-  def chooseBestCity(choices: Set[(City, Double)]): City = choices.maxBy(_._2)._1
+  def chooseBestCity(availableCities: Set[City], city: City, alpha: Int, beta: Int): City = {
+    weightedChoices(availableCities, city, alpha, beta).maxBy(_._2)._1
+  }
+  def weightedChoices(availableCities: Set[City], city: City, alpha: Int, beta: Int): Set[(City, Double)] =
+    availableCities.flatMap { nextCity =>
+      val distance  = cityMap.getOrElse(Set(city, nextCity), Int.MaxValue)
+      if (distance == Int.MaxValue) None
+      else Some(nextCity -> 1.0 / distance)
+    }
 }

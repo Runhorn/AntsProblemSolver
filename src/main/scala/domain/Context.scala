@@ -1,10 +1,11 @@
 package domain
 
 import scala.collection.mutable
-import scala.collection.immutable.{ Map, Seq, Set }
+import scala.collection.immutable.{ Map, Set }
 import scala.io.Source
 import scala.util.Random
 
+//noinspection SourceNotClosed
 object Context {
   val cities: List[City] =
     Source
