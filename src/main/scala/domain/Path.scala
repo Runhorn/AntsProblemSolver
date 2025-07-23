@@ -14,8 +14,8 @@ case class Path(cities: List[City]) {
     cities.sliding(2).foreach {
       case List(a, b) =>
         val edge = Set(a, b)
-        Context.scentMap.synchronized {
-          Context.scentMap.updateWith(edge) {
+        scentMap.synchronized {
+          scentMap.updateWith(edge) {
             case Some(value) => Some(value + pheromone)
             case None        => Some(pheromone)
           }

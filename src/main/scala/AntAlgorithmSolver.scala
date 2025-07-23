@@ -35,13 +35,7 @@ object AntAlgorithmSolver extends App with LazyLogging {
   }
 
   OParser.parse(parser, args, Config()) match {
-    case Some(config) =>
-      val start = System.nanoTime()
-      val bestPath = new Solver(cities.toSet, config).solve
-      logger.info(s"Best path: ${bestPath.cities.map(_.id)}")
-      logger.info(s"Distance: ${bestPath.distance}")
-      val end = System.nanoTime()
-      logger.info(s"Execution time: ${(end - start) / 1e6} ms")
+    case Some(config) => new Solver(cities.toSet, config).solve
     case _ => logger.error("Invalid arguments! Use --help to see available options.")
   }
 }
