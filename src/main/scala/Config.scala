@@ -1,8 +1,8 @@
 case class Config(
     alpha: Int = 1,
-    beta: Int = 5,
+    beta: Int = 3,
     ants: Int = 48,
-    iterations: Int = 10,
+    iterations: Int = 100,
     vaporCoeff: Double = 0.3,
-    strategy: Strategy = Naive
+    strategy: Strategy = WeightedRandom
 )

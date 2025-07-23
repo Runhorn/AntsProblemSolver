@@ -11,7 +11,10 @@ lazy val root = (project in file("."))
   )
 
 libraryDependencies += "com.github.scopt" %% "scopt" % "4.1.0"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % Test
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.19" % Test
+libraryDependencies += "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0"
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.18"
 
 unmanagedResourceDirectories in Compile += baseDirectory.value / "src" / "main" / "resources"
 

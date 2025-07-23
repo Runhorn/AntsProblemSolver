@@ -10,13 +10,17 @@ case class Path(cities: List[City]) {
   }.sum
 
   def leaveScent(): Unit = {
-    for (i <- 0 until cities.length - 1) {
-      val route               = Set(cities(i), cities(i + 1))
-      val scentAmount: Double = 1.0 / cityMap(route)
-      scentMap.updateWith(route) {
-        case Some(value) => Some(value + scentAmount)
-        case None        => Some(scentAmount)
-      }
+    val pheromone = 1.0 / (this.distance + 1e-6)
+    cities.sliding(2).foreach {
+      case List(a, b) =>
+        val edge = Set(a, b)
+        Context.scentMap.synchronized {
+          Context.scentMap.updateWith(edge) {
+            case Some(value) => Some(value + pheromone)
+            case None        => Some(pheromone)
+          }
+        }
+      case _ => ()
     }
   }
 }

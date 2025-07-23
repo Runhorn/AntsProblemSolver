@@ -4,23 +4,26 @@ import domain.Context.{ cityMap, scentMap }
 import scala.util.Random
 
 sealed trait Strategy {
-  def chooseBestCity(availableCities: Set[City], lastCity: City, alpha: Int, beta: Int): City
+  def chooseBestCity(choices: IndexedSeq[(City, Double)]): City
   def weightedChoices(
       availableCities: Set[City],
       lastCity: City,
       alpha: Int,
       beta: Int
-  ): Set[(City, Double)]
+  ): IndexedSeq[(City, Double)]
 }
 
 case object WeightedRandom extends Strategy {
-  def chooseBestCity(availableCities: Set[City], lastCity: City, alpha: Int, beta: Int): City = {
-    val choices = weightedChoices(availableCities, lastCity, alpha, beta)
-    takeRandomAtChance(
-      choices.map { case (city, weight) =>
-        (city, weight / choices.map(_._2).sum)
-      }
-    )
+  def chooseBestCity(choices: IndexedSeq[(City, Double)]): City = {
+    val weights = choices.map(_._2)
+    val total = weights.sum
+    if (choices.isEmpty) throw new NoSuchElementException("No available cities")
+    val normalized = weights.map(_ / total)
+    val cumulative = normalized.scanLeft(0.0)(_ + _).tail.toArray
+    val r = Random.nextDouble()
+    val idx = java.util.Arrays.binarySearch(cumulative, r)
+    val pos = if (idx < 0) -idx - 1 else idx
+    choices(pos)._1
   }
 
   def weightedChoices(
@@ -28,8 +31,8 @@ case object WeightedRandom extends Strategy {
       lastCity: City,
       alpha: Int,
       beta: Int
-  ): Set[(City, Double)] =
-    availableCities.flatMap { nextCity =>
+  ): IndexedSeq[(City, Double)] =
+    availableCities.toIndexedSeq.flatMap { nextCity =>
       val distance  = cityMap.getOrElse(Set(lastCity, nextCity), Int.MaxValue)
       val pheromone = scentMap.getOrElse(Set(lastCity, nextCity), 1.0)
 
@@ -40,30 +43,17 @@ case object WeightedRandom extends Strategy {
         Some(nextCity -> attractiveness)
       }
     }
-
-  private def takeRandomAtChance(probabilities: Set[(City, Double)]): City = {
-    val r = Random.nextDouble()
-    probabilities
-      .foldLeft((Option.empty[City], 0.0)) { case ((selected, cumulative), (city, probability)) =>
-        val newCumulative = cumulative + probability
-        if (selected.isEmpty && newCumulative >= r) (Some(city), newCumulative)
-        else (selected, newCumulative)
-      }
-      ._1
-      .getOrElse(probabilities.head._1)
-  }
 }
 
 case object Naive extends Strategy {
-  def chooseBestCity(availableCities: Set[City], lastCity: City, alpha: Int, beta: Int): City =
-    weightedChoices(availableCities, lastCity, alpha, beta).maxBy(_._2)._1
+  def chooseBestCity(choices: IndexedSeq[(City, Double)]): City = choices.maxBy(_._2)._1
   def weightedChoices(
       availableCities: Set[City],
       lastCity: City,
       alpha: Int,
       beta: Int
-  ): Set[(City, Double)] =
-    availableCities.flatMap { nextCity =>
+  ): IndexedSeq[(City, Double)] =
+    availableCities.toIndexedSeq.flatMap { nextCity =>
       val distance = cityMap.getOrElse(Set(lastCity, nextCity), Int.MaxValue)
       if (distance == Int.MaxValue) None
       else Some(nextCity -> 1.0 / distance)

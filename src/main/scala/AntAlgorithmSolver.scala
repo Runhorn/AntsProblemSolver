@@ -1,11 +1,13 @@
 import domain.Context.cities
 import scopt.{ OParser, Read }
 
-object AntAlgorithmSolver extends App {
+import com.typesafe.scalalogging.LazyLogging
+
+object AntAlgorithmSolver extends App with LazyLogging {
   implicit val strategyRead: Read[Strategy] = Read.reads {
     case "WeightedRandom" => WeightedRandom
     case "Naive"          => Naive
-    case other            => throw new IllegalArgumentException(s"Niewspierana strategia: $other")
+    case other            => throw new IllegalArgumentException(s"Unsupported strategy: $other")
   }
   val configParser = OParser.builder[Config]
   val parser = {
@@ -13,30 +15,33 @@ object AntAlgorithmSolver extends App {
     OParser.sequence(
       opt[Int]("alpha")
         .action((x, c) => c.copy(alpha = x))
-        .text("Współczynnik alfa"),
+        .text("Alpha"),
       opt[Int]("beta")
         .action((x, c) => c.copy(beta = x))
-        .text("Współczynnik"),
+        .text("Beta"),
       opt[Int]("ants")
         .action((x, c) => c.copy(ants = x))
-        .text("Liczba mrówek"),
+        .text("Ants count"),
       opt[Int]("iterations")
         .action((x, c) => c.copy(iterations = x))
-        .text("Liczba iteracji"),
+        .text("Number of iterations"),
       opt[Double]("vaporCoeff")
         .action((x, c) => c.copy(vaporCoeff = x))
-        .text("Współczynnik parowania"),
+        .text("Vaporization coefficient"),
       opt[Strategy]("strategy")
         .action((x, c) => c.copy(strategy = x))
-        .text("Wybór strategii")
+        .text("Strategy choice: WeightedRandom or Naive"),
     )
   }
 
   OParser.parse(parser, args, Config()) match {
     case Some(config) =>
+      val start = System.nanoTime()
       val bestPath = new Solver(cities.toSet, config).solve
-      println(bestPath.cities.map(c => c.id))
-      println(bestPath.distance)
-    case _ => println("Podano nieprawidłowe argumenty! Użyj --help, aby zobaczyć dostępne.")
+      logger.info(s"Best path: ${bestPath.cities.map(_.id)}")
+      logger.info(s"Distance: ${bestPath.distance}")
+      val end = System.nanoTime()
+      logger.info(s"Execution time: ${(end - start) / 1e6} ms")
+    case _ => logger.error("Invalid arguments! Use --help to see available options.")
   }
 }
