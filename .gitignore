@@ -14,10 +14,14 @@ project/target/*
 project/plugins/project/*
 .history
 .cache
+sbt.json
+sbt.xml
+*.iml
 .lib/*
 
 ### IntelliJ ###
-.idea
+.idea/*
+.bsp/*
 
 ### Scala ###
 *.class
