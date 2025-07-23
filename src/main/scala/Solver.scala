@@ -31,9 +31,9 @@ class Solver(cities: Set[City], config: Config) extends LazyLogging {
     val trace = ArrayBuffer.empty[(Int, Double, Path)]
     val startTime = System.nanoTime
 
-    val result = (1 to config.iterations).foldLeft(Path(List.empty[City])) { (bestPath, iter) =>
+   (1 to config.iterations).foldLeft(Path(List.empty[City])) { (bestPath, iter) =>
       def antPaths    = (1 to config.ants).par.map(_ => traverseWithAnt(cities)).toList
-      def newBestPath = antPaths.minByOption(_.distance).getOrElse(bestPath)
+      val newBestPath = antPaths.minByOption(_.distance).getOrElse(bestPath)
       config.strategy match {
         case Naive => ()
         case WeightedRandom =>
@@ -53,6 +53,6 @@ class Solver(cities: Set[City], config: Config) extends LazyLogging {
     val bestOverall = trace.minBy(_._2)
     logger.info(s"Best path with distance = ${bestOverall._2} at iteration ${bestOverall._1}")
     logger.info(s"Total execution time: $execTimeMs ms")
-    result
+    bestOverall._3
   }
 }
